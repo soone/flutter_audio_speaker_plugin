@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp> {
       device: AudioDevice.speaker,
     );
 
-    FlutterAudioSpeakerPlugin plugin = FlutterAudioSpeakerPlugin();
+    FlutterAudioSpeakerPlugin.setSpeakerOn(false);
     await soundPlayer.setSubscriptionDuration(const Duration(milliseconds: 30));
     Uint8List? dataBuffer;
     ByteData data = await rootBundle.load("assets/audio/calling.mp3");
@@ -51,10 +51,10 @@ class _MyAppState extends State<MyApp> {
       sampleRate: 16000,
     )
         .then((_) {
-      plugin.setSpeakerOn(false);
+      // FlutterAudioSpeakerPlugin.setSpeakerOn(false);
     });
 
-    Future.delayed(const Duration(seconds: 5), () => plugin.setSpeakerOn(true));
+    // Future.delayed(const Duration(seconds: 5), () => FlutterAudioSpeakerPlugin.resetSpeaker());
 
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling

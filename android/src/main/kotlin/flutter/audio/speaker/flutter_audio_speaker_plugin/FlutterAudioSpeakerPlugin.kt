@@ -87,6 +87,10 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
                 if (isOn != null && isOn) changeMode(PlayMode.Speaker) else changeMode(PlayMode.Receiver)
             }
             result.success("ok")
+        } else if(call.method == "resetSpeakerPhone") {
+            if (playMode != PlayMode.Headset) {
+                changeMode(latestPlayMode)
+            }
         } else {
             result.notImplemented()
         }
