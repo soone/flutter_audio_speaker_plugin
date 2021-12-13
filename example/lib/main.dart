@@ -20,11 +20,17 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
+  bool speaker = false;
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
+  }
+
+  void setSpeakerOn() async {
+    await FlutterAudioSpeakerPlugin.setSpeakerOn(!speaker);
+    speaker = !speaker;
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -39,20 +45,16 @@ class _MyAppState extends State<MyApp> {
       device: AudioDevice.speaker,
     );
 
-    FlutterAudioSpeakerPlugin.setSpeakerOn(false);
+    await FlutterAudioSpeakerPlugin.setSpeakerOn(speaker);
     await soundPlayer.setSubscriptionDuration(const Duration(milliseconds: 30));
     Uint8List? dataBuffer;
     ByteData data = await rootBundle.load("assets/audio/calling.mp3");
     dataBuffer = data.buffer.asUint8List();
-    soundPlayer
-        .startPlayer(
+    soundPlayer.startPlayer(
       fromDataBuffer: dataBuffer,
       codec: Codec.aacADTS,
       sampleRate: 16000,
-    )
-        .then((_) {
-      // FlutterAudioSpeakerPlugin.setSpeakerOn(false);
-    });
+    );
 
     // Future.delayed(const Duration(seconds: 5), () => FlutterAudioSpeakerPlugin.resetSpeaker());
 
@@ -73,8 +75,11 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        body: GestureDetector(
+          onTap: setSpeakerOn,
+          child: Center(
+            child: Text('Running on: $_platformVersion\n'),
+          ),
         ),
       ),
     );

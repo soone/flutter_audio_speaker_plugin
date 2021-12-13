@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import AVFoundation
 
 public class SwiftFlutterAudioSpeakerPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -9,6 +10,32 @@ public class SwiftFlutterAudioSpeakerPlugin: NSObject, FlutterPlugin {
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    result("iOS " + UIDevice.current.systemVersion)
+      switch call.method {
+      case "setSpeakerPhoneOn":
+          let args = call.arguments as? Dictionary<String, AnyObject>
+          if args?["isOn"] != nil {
+              let isOn = args?["isOn"] as! Bool
+              
+              do {
+                  if isOn {
+                      try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+                      try AVAudioSession.sharedInstance().overrideOutputAudioPort(AVAudioSession.PortOverride.speaker)
+                  } else {
+                      try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .default)
+                      try AVAudioSession.sharedInstance().overrideOutputAudioPort(AVAudioSession.PortOverride.none)
+                  }
+                  
+                  try AVAudioSession.sharedInstance().setActive(true)
+              } catch {
+                  print(error)
+              }
+          }
+          result("ok")
+      case "resetSpeakerPhone":
+          result("resetSpeakerPhone")
+      default:
+          result(FlutterMethodNotImplemented)
+      }
+    
   }
 }
