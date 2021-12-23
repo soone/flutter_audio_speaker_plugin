@@ -27,21 +27,22 @@ public class SwiftFlutterAudioSpeakerPlugin: NSObject, FlutterPlugin {
                   
                   if isOn {
                       try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-                      try AVAudioSession.sharedInstance().overrideOutputAudioPort(AVAudioSession.PortOverride.speaker)
+//                      try AVAudioSession.sharedInstance().overrideOutputAudioPort(AVAudioSession.PortOverride.speaker)
                   } else {
                       try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .default)
-                      try AVAudioSession.sharedInstance().overrideOutputAudioPort(AVAudioSession.PortOverride.none)
+//                      try AVAudioSession.sharedInstance().overrideOutputAudioPort(AVAudioSession.PortOverride.none)
                   }
                   
                   try AVAudioSession.sharedInstance().setActive(true)
               } catch {
-                  print(error)
+                  NSLog("error====%@", error.localizedDescription)
               }
           }
           result("ok")
       case "resetSpeakerPhone":
           if category != nil {
             try? AVAudioSession.sharedInstance().setCategory(category!, mode: .default)
+            try? AVAudioSession.sharedInstance().setActive(true)
           }
           
           result("resetSpeakerPhone")

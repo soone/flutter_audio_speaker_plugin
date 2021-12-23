@@ -31,6 +31,12 @@ class _MyAppState extends State<MyApp> {
   void setSpeakerOn() async {
     await FlutterAudioSpeakerPlugin.setSpeakerOn(!speaker);
     speaker = !speaker;
+    setState(() {});
+  }
+
+  void resetSpeakerOn() async {
+    await FlutterAudioSpeakerPlugin.resetSpeaker();
+    setState(() {});
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -75,10 +81,18 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: GestureDetector(
-          onTap: setSpeakerOn,
-          child: Center(
-            child: Text('Running on: $_platformVersion\n'),
+        body: Center(
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: setSpeakerOn,
+                child: SizedBox(height: 120, child: Text("speak====$speaker")),
+              ),
+              GestureDetector(
+                onTap: resetSpeakerOn,
+                child: const SizedBox(height: 120, child: Text("reset")),
+              )
+            ],
           ),
         ),
       ),
