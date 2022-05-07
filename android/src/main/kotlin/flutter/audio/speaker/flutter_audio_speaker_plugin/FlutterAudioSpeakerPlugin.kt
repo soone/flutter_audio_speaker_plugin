@@ -1,11 +1,13 @@
 package flutter.audio.speaker.flutter_audio_speaker_plugin
 
+import android.bluetooth.BluetoothAdapter
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.media.AudioDeviceInfo
 import android.media.AudioManager
-import android.util.Log
+import android.os.Build
 import androidx.annotation.NonNull
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -41,13 +43,32 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
 
         val intentFilter = IntentFilter()
         intentFilter.addAction(Intent.ACTION_HEADSET_PLUG)
+        intentFilter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)
+        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         context.registerReceiver(object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == Intent.ACTION_HEADSET_PLUG) {
                     val state = intent.getIntExtra("state", 0)
+                    channel.invokeMethod("headSetStatus", state)
                     if (state == 1) {
                         changeMode(PlayMode.Headset)
                     } else if (state == 0) {
+                        changeMode(latestPlayMode)
+                    }
+                } else if (intent?.action == BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED) {
+                    val state = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, 0)
+                    if (state != 0) {
+                        changeMode(PlayMode.Headset)
+                    } else {
+                        changeMode(latestPlayMode)
+                    }
+                    channel.invokeMethod("bluetoothStatus", state)
+                } else if (intent?.action == BluetoothAdapter.ACTION_STATE_CHANGED) {
+                    val state = intent.getIntExtra(BluetoothAdapter.ACTION_STATE_CHANGED, 0)
+                    channel.invokeMethod("bluetoothStatus", state)
+                    if (state != 0) {
+                        changeMode(PlayMode.Headset)
+                    } else {
                         changeMode(latestPlayMode)
                     }
                 }
@@ -91,6 +112,12 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
             if (playMode != PlayMode.Headset) {
                 changeMode(latestPlayMode)
             }
+        } else if(call.method == "isHeadSetOn") {
+            if (isHeadSetOn()) {
+                result.success("1");
+            } else {
+                result.success("0");
+            }
         } else {
             result.notImplemented()
         }
@@ -98,5 +125,26 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+    }
+
+    private fun isHeadSetOn() : Boolean{
+        if (audioManager == null) return false
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return audioManager.isWiredHeadsetOn || audioManager.isBluetoothScoOn || audioManager.isBluetoothA2dpOn
+        } else {
+            val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+
+            for (device in devices) {
+                if (device.type == AudioDeviceInfo.TYPE_WIRED_HEADSET
+                    || device.type == AudioDeviceInfo.TYPE_WIRED_HEADPHONES
+                    || device.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP
+                    || device.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
+                    return true
+                }
+            }
+        }
+
+        return false
     }
 }

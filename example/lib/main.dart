@@ -19,13 +19,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  // String _platformVersion = 'Unknown';
   bool speaker = false;
 
   @override
   void initState() {
     super.initState();
+    FlutterAudioSpeakerPlugin.setHandler(handleMessage);
     initPlatformState();
+  }
+
+  Future<dynamic> handleMessage(MethodCall call) async {
+    print("===call==" + call.toString());
   }
 
   void setSpeakerOn() async {
@@ -37,6 +42,11 @@ class _MyAppState extends State<MyApp> {
   void resetSpeakerOn() async {
     await FlutterAudioSpeakerPlugin.resetSpeaker();
     setState(() {});
+  }
+
+  void isInCall() async {
+    String isInCall = await FlutterAudioSpeakerPlugin.isHeadSetOn();
+    print("===isHeadSetOn===" + isInCall);
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -60,6 +70,15 @@ class _MyAppState extends State<MyApp> {
       fromDataBuffer: dataBuffer,
       codec: Codec.aacADTS,
       sampleRate: 16000,
+      whenFinished: () {
+        print("===finished===");
+        soundPlayer.seekToPlayer(Duration.zero);
+        soundPlayer.startPlayer(
+          fromDataBuffer: dataBuffer,
+          codec: Codec.aacADTS,
+          sampleRate: 16000,
+        );
+      },
     );
 
     // Future.delayed(const Duration(seconds: 5), () => FlutterAudioSpeakerPlugin.resetSpeaker());
@@ -69,9 +88,9 @@ class _MyAppState extends State<MyApp> {
     // setState to update our non-existent appearance.
     if (!mounted) return;
 
-    setState(() {
-      _platformVersion = "1111";
-    });
+    // setState(() {
+    //   _platformVersion = "1111";
+    // });
   }
 
   @override
@@ -91,6 +110,10 @@ class _MyAppState extends State<MyApp> {
               GestureDetector(
                 onTap: resetSpeakerOn,
                 child: const SizedBox(height: 120, child: Text("reset")),
+              ),
+              GestureDetector(
+                onTap: isInCall,
+                child: const SizedBox(height: 120, child: Text("isINCall")),
               )
             ],
           ),
