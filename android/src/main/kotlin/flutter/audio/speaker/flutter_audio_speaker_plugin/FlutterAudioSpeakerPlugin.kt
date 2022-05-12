@@ -109,22 +109,26 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
                 if (isOn != null && isOn) changeMode(PlayMode.Speaker) else changeMode(PlayMode.Receiver)
             }
             result.success("ok")
-        } else if(call.method == "resetSpeakerPhone") {
+        } else if (call.method == "resetSpeakerPhone") {
             if (playMode != PlayMode.Headset) {
                 changeMode(latestPlayMode)
             }
-        } else if(call.method == "isHeadSetOn") {
+        } else if (call.method == "isHeadSetOn") {
             if (isHeadSetOn()) {
                 result.success("1");
             } else {
                 result.success("0");
             }
-        } else if(call.method == "rongcloudInit") {
+        } else if (call.method == "rongcloudInit") {
             if (!RCRTCAudioRouteManager.getInstance().hasInit()) {
                 RCRTCAudioRouteManager.getInstance().init(context)
             }
 
             result.success("ok")
+        } else if (call.method == "rongcloudReset") {
+            if (RCRTCAudioRouteManager.getInstance().hasInit()) {
+                RCRTCAudioRouteManager.getInstance().resetAudioRouteState();
+            }
         } else {
             result.notImplemented()
         }
