@@ -15,6 +15,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import cn.rongcloud.rtc.api.*
 
 /** FlutterAudioSpeakerPlugin */
 class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
@@ -118,6 +119,12 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
             } else {
                 result.success("0");
             }
+        } else if(call.method == "rongcloudInit") {
+            if (!RCRTCAudioRouteManager.getInstance().hasInit()) {
+                RCRTCAudioRouteManager.getInstance().init(context)
+            }
+
+            result.success("ok")
         } else {
             result.notImplemented()
         }
