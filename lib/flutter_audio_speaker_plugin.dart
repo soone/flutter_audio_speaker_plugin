@@ -25,4 +25,8 @@ class FlutterAudioSpeakerPlugin {
   static Future<String> isHeadSetOn() async {
     return await platform.invokeMethod("isHeadSetOn");
   }
+
+  static Future<String> rongclousInit() async {
+    return await platform.invokeMethod("rongcloudInit");
+  }
 }
