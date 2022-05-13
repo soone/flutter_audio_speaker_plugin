@@ -26,6 +26,7 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var channel: MethodChannel
     private lateinit var context: Context
     private lateinit var audioManager: AudioManager
+    private var rongcloudAudioManager : RCRTCAudioRouteManager? = null
 
     enum class PlayMode {
         Speaker, // 外放
@@ -99,6 +100,8 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
             PlayMode.Speaker -> changeToSpeaker()
             PlayMode.Headset -> changeToHeadset()
         }
+
+        resetRongcloud()
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -122,13 +125,12 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
         } else if (call.method == "rongcloudInit") {
             if (!RCRTCAudioRouteManager.getInstance().hasInit()) {
                 RCRTCAudioRouteManager.getInstance().init(context)
+                rongcloudAudioManager = RCRTCAudioRouteManager.getInstance()
             }
 
             result.success("ok")
         } else if (call.method == "rongcloudReset") {
-            if (RCRTCAudioRouteManager.getInstance().hasInit()) {
-                RCRTCAudioRouteManager.getInstance().resetAudioRouteState();
-            }
+            rongcloudAudioManager?.resetAudioRouteState()
         } else {
             result.notImplemented()
         }
@@ -139,23 +141,33 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     private fun isHeadSetOn() : Boolean{
-        if (audioManager == null) return false
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return audioManager.isWiredHeadsetOn || audioManager.isBluetoothScoOn || audioManager.isBluetoothA2dpOn
+        if (rongcloudAudioManager != null) {
+            return rongcloudAudioManager!!.hasHeadSet() || rongcloudAudioManager!!.hasBluetoothA2dpConnected()
         } else {
-            val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+            if (audioManager == null) return false
 
-            for (device in devices) {
-                if (device.type == AudioDeviceInfo.TYPE_WIRED_HEADSET
-                    || device.type == AudioDeviceInfo.TYPE_WIRED_HEADPHONES
-                    || device.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP
-                    || device.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
-                    return true
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                return audioManager.isWiredHeadsetOn || audioManager.isBluetoothScoOn || audioManager.isBluetoothA2dpOn
+            } else {
+                val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+
+                for (device in devices) {
+                    if (device.type == AudioDeviceInfo.TYPE_WIRED_HEADSET
+                        || device.type == AudioDeviceInfo.TYPE_WIRED_HEADPHONES
+                        || device.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP
+                        || device.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
+                        return true
+                    }
                 }
             }
         }
 
         return false
+    }
+
+    private fun resetRongcloud() {
+        if (rongcloudAudioManager != null) {
+            rongcloudAudioManager!!.resetAudioRouteState()
+        }
     }
 }
