@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
+import android.util.Log
 import androidx.annotation.NonNull
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -170,7 +171,11 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
             rongcloudAudioManager!!.resetAudioRouteState()
         } else {
             RCRTCAudioRouteManager.getInstance().init(context)
-            RCRTCAudioRouteManager.getInstance().resetAudioRouteState()
+            Log.e("audio=====", "init")
+            if (RCRTCAudioRouteManager.getInstance().hasInit()) {
+                Log.e("audio=====", "init nononono")
+                RCRTCAudioRouteManager.getInstance().resetAudioRouteState()
+            }
         }
     }
 }
