@@ -82,23 +82,31 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
     private fun changeToHeadset() {
         audioManager.isSpeakerphoneOn = false
         if (rongcloudAudioManager != null) {
+            Log.e("xxxxxx", (audioManager.mode == AudioManager.MODE_IN_COMMUNICATION).toString())
             audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
         }
     }
 
     private fun changeToSpeaker() {
-        audioManager.mode = AudioManager.MODE_NORMAL
+        if (rongcloudAudioManager != null) {
+            Log.e("xxxxxx1", (audioManager.mode == AudioManager.MODE_IN_COMMUNICATION).toString())
+            audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+        } else {
+            audioManager.mode = AudioManager.MODE_NORMAL
+        }
         audioManager.isSpeakerphoneOn = true
     }
 
     private fun changeToReceiver() {
         audioManager.isSpeakerphoneOn = false
         audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+        Log.e("xxxxxx2", (audioManager.mode == AudioManager.MODE_IN_COMMUNICATION).toString())
     }
 
     private fun changeMode(pm: PlayMode) {
         latestPlayMode = playMode
         playMode = pm
+        Log.e("xxxxxx3", (audioManager.mode == AudioManager.MODE_IN_COMMUNICATION).toString())
         when (playMode) {
             PlayMode.Receiver -> changeToReceiver()
             PlayMode.Speaker -> changeToSpeaker()
