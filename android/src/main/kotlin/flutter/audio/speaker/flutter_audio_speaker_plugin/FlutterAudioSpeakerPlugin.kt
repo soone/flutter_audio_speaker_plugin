@@ -81,6 +81,9 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
 
     private fun changeToHeadset() {
         audioManager.isSpeakerphoneOn = false
+        if (rongcloudAudioManager != null) {
+            audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+        }
     }
 
     private fun changeToSpeaker() {
