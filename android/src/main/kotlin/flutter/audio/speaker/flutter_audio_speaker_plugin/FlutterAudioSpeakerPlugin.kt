@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.NonNull
 
@@ -43,6 +44,8 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
         channel.setMethodCallHandler(this)
         context = flutterPluginBinding.getApplicationContext()
         audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+        Log.e("xxxxxx000", (audioManager.mode == AudioManager.MODE_IN_COMMUNICATION).toString())
 
         val intentFilter = IntentFilter()
         intentFilter.addAction(Intent.ACTION_HEADSET_PLUG)
