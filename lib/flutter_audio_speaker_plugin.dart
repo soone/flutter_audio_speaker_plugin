@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 
@@ -23,18 +24,22 @@ class FlutterAudioSpeakerPlugin {
   }
 
   static Future<String> isHeadSetOn() async {
+    if (Platform.isIOS) return Future.value('-1');
     return await platform.invokeMethod("isHeadSetOn");
   }
 
   static Future<String> rongcloudInit() async {
+    if (Platform.isIOS) return Future.value('ok');
     return await platform.invokeMethod("rongcloudInit");
   }
 
   static Future<String> rongcloudReset() async {
+    if (Platform.isIOS) return Future.value('ok');
     return await platform.invokeMethod("rongcloudReset");
   }
 
   static Future<String> setMode(String mode) async {
+    if (Platform.isIOS) return Future.value('ok');
     return await platform.invokeMethod("setMode", {"mode": mode});
   }
 }
