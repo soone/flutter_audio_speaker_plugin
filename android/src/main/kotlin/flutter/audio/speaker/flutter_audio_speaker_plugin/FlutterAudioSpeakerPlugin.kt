@@ -44,8 +44,6 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
         channel.setMethodCallHandler(this)
         context = flutterPluginBinding.getApplicationContext()
         audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-        Log.e("xxxxxx000", (audioManager.mode == AudioManager.MODE_IN_COMMUNICATION).toString())
 
         val intentFilter = IntentFilter()
         intentFilter.addAction(Intent.ACTION_HEADSET_PLUG)
@@ -56,27 +54,27 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
                 if (intent?.action == Intent.ACTION_HEADSET_PLUG) {
                     val state = intent.getIntExtra("state", 0)
                     channel.invokeMethod("headSetStatus", state)
-                    if (state == 1) {
-                        changeMode(PlayMode.Headset)
-                    } else if (state == 0) {
-                        changeMode(latestPlayMode)
-                    }
+//                    if (state == 1) {
+//                        changeMode(PlayMode.Headset)
+//                    } else if (state == 0) {
+//                        changeMode(latestPlayMode)
+//                    }
                 } else if (intent?.action == BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED) {
                     val state = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, 0)
-                    if (state != 0) {
-                        changeMode(PlayMode.Headset)
-                    } else {
-                        changeMode(latestPlayMode)
-                    }
+//                    if (state != 0) {
+//                        changeMode(PlayMode.Headset)
+//                    } else {
+//                        changeMode(latestPlayMode)
+//                    }
                     channel.invokeMethod("bluetoothStatus", state)
                 } else if (intent?.action == BluetoothAdapter.ACTION_STATE_CHANGED) {
                     val state = intent.getIntExtra(BluetoothAdapter.ACTION_STATE_CHANGED, 0)
                     channel.invokeMethod("bluetoothStatus", state)
-                    if (state != 0) {
-                        changeMode(PlayMode.Headset)
-                    } else {
-                        changeMode(latestPlayMode)
-                    }
+//                    if (state != 0) {
+//                        changeMode(PlayMode.Headset)
+//                    } else {
+//                        changeMode(latestPlayMode)
+//                    }
                 }
             }
         }, intentFilter)
@@ -135,6 +133,7 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
                 result.success("0");
             }
         } else if (call.method == "rongcloudInit") {
+            audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
             if (!RCRTCAudioRouteManager.getInstance().hasInit()) {
                 RCRTCAudioRouteManager.getInstance().init(context)
                 rongcloudAudioManager = RCRTCAudioRouteManager.getInstance()
@@ -143,7 +142,19 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
             result.success("ok")
         } else if (call.method == "rongcloudReset") {
             rongcloudAudioManager?.resetAudioRouteState()
-        } else {
+        } else if (call.method == "setMode") {
+            if (call.hasArgument("mode")) {
+               if (call.argument<String>("mode") == "normal") {
+                   audioManager.mode = AudioManager.MODE_NORMAL
+               } else if (call.argument<String>("mode") == "communication") {
+                   audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+               }
+            }
+
+            rongcloudAudioManager?.resetAudioRouteState()
+            result.success("ok")
+        }
+        else {
             result.notImplemented()
         }
     }
