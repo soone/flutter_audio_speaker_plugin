@@ -143,6 +143,7 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
             result.success("ok")
         } else if (call.method == "rongcloudReset") {
             resetRongcloud()
+            result.success("ok")
         } else if (call.method == "setMode") {
             if (call.hasArgument("mode")) {
                if (call.argument<String>("mode") == "normal") {
