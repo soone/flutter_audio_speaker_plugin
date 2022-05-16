@@ -33,4 +33,8 @@ class FlutterAudioSpeakerPlugin {
   static Future<String> rongcloudReset() async {
     return await platform.invokeMethod("rongcloudReset");
   }
+
+  static Future<String> setMode(String mode) async {
+    return await platform.invokeMethod("setMode", {"mode": mode});
+  }
 }
