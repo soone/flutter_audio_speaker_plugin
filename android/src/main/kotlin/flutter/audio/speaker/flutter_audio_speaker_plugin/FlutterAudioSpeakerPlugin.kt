@@ -119,6 +119,7 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
         if (call.method == "setSpeakerPhoneOn") {
             if (call.hasArgument("isOn") && playMode != PlayMode.Headset) {
                 var isOn: Boolean? = call.argument("isOn")
+                Log.e("xxxx==isOn", call.arguments.toString())
                 if (isOn != null && isOn) changeMode(PlayMode.Speaker) else changeMode(PlayMode.Headset)
             }
             result.success("ok")
