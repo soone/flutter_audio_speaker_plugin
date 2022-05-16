@@ -111,7 +111,7 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
             PlayMode.Headset -> changeToHeadset()
         }
 
-        resetRongcloud()
+//        resetRongcloud()
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
