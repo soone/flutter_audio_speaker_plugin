@@ -102,9 +102,9 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
             }
         } else if (call.method == "isHeadSetOn") {
             if (isHeadSetOn()) {
-                result.success("1");
+                result.success(1);
             } else {
-                result.success("0");
+                result.success(0);
             }
         } else if (call.method == "rongcloudInit") {
             audioManager.mode = AudioManager.MODE_IN_COMMUNICATION

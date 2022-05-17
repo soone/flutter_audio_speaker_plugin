@@ -23,8 +23,8 @@ class FlutterAudioSpeakerPlugin {
     await platform.invokeMethod("resetSpeakerPhone");
   }
 
-  static Future<String> isHeadSetOn() async {
-    if (Platform.isIOS) return Future.value('-1');
+  static Future<int> isHeadSetOn() async {
+    if (Platform.isIOS) return Future.value(-1);
     return await platform.invokeMethod("isHeadSetOn");
   }
 
