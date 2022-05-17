@@ -81,15 +81,13 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     private fun changeToHeadset() {
-        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+//        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
         audioManager.isSpeakerphoneOn = false
-        Log.e("xxxxxx", (audioManager.mode == AudioManager.MODE_IN_COMMUNICATION).toString())
         audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL), AudioManager.STREAM_VOICE_CALL)
     }
 
     private fun changeToSpeaker() {
-        Log.e("xxxxxx1", (audioManager.mode == AudioManager.MODE_IN_COMMUNICATION).toString())
-        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+//        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
 //            audioManager.mode = AudioManager.MODE_NORMAL
         audioManager.isSpeakerphoneOn = true
         audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL), AudioManager.STREAM_VOICE_CALL)
@@ -97,14 +95,12 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
 
     private fun changeToReceiver() {
         audioManager.isSpeakerphoneOn = false
-        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-        Log.e("xxxxxx2", (audioManager.mode == AudioManager.MODE_IN_COMMUNICATION).toString())
+//        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
     }
 
     private fun changeMode(pm: PlayMode) {
         latestPlayMode = playMode
         playMode = pm
-        Log.e("xxxxxx3", (audioManager.mode == AudioManager.MODE_IN_COMMUNICATION).toString())
         when (playMode) {
             PlayMode.Receiver -> changeToReceiver()
             PlayMode.Speaker -> changeToSpeaker()
@@ -119,7 +115,6 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
         if (call.method == "setSpeakerPhoneOn") {
             if (call.hasArgument("isOn") && playMode != PlayMode.Headset) {
                 var isOn: Boolean? = call.argument("isOn")
-                Log.e("xxxx==isOn", call.arguments.toString())
                 if (isOn != null && isOn) changeMode(PlayMode.Speaker) else changeMode(PlayMode.Headset)
             }
             result.success("ok")
@@ -147,10 +142,8 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
         } else if (call.method == "setMode") {
             if (call.hasArgument("mode")) {
                if (call.argument<String>("mode") == "normal") {
-                   Log.e("setMode==1", call.argument<String>("mode").toString())
                    audioManager.mode = AudioManager.MODE_NORMAL
                } else if (call.argument<String>("mode") == "communication") {
-                   Log.e("setMode==2", call.argument<String>("mode").toString())
                    audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
                }
             }
