@@ -193,12 +193,14 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
     private fun resetRongcloud() {
         if (rongcloudAudioManager != null) {
             rongcloudAudioManager!!.resetAudioRouteState()
+            rongcloudAudioManager!!.unInit()
         } else {
             RCRTCAudioRouteManager.getInstance().init(context)
             Log.e("audio=====", "init")
             if (RCRTCAudioRouteManager.getInstance().hasInit()) {
                 Log.e("audio=====", "init nononono")
                 RCRTCAudioRouteManager.getInstance().resetAudioRouteState()
+                RCRTCAudioRouteManager.getInstance().unInit()
             }
         }
     }
