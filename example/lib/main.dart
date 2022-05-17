@@ -45,8 +45,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   void isInCall() async {
-    String isInCall = await FlutterAudioSpeakerPlugin.isHeadSetOn();
-    print("===isHeadSetOn===" + isInCall);
+    int isInCall = await FlutterAudioSpeakerPlugin.isHeadSetOn();
+    print("===isHeadSetOn===" + isInCall.toString());
   }
 
   void changeMode() async {
