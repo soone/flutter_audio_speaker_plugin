@@ -124,6 +124,7 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
                } else if (call.argument<String>("mode") == "communication") {
                    audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
                }
+                Log.e("====mode==", audioManager.mode.toString())
             }
 
             rongcloudAudioManager?.resetAudioRouteState()
