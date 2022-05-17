@@ -54,66 +54,44 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
                 if (intent?.action == Intent.ACTION_HEADSET_PLUG) {
                     val state = intent.getIntExtra("state", 0)
                     channel.invokeMethod("headSetStatus", state)
-//                    if (state == 1) {
-//                        changeMode(PlayMode.Headset)
-//                    } else if (state == 0) {
-//                        changeMode(latestPlayMode)
-//                    }
                 } else if (intent?.action == BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED) {
                     val state = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, 0)
-//                    if (state != 0) {
-//                        changeMode(PlayMode.Headset)
-//                    } else {
-//                        changeMode(latestPlayMode)
-//                    }
                     channel.invokeMethod("bluetoothStatus", state)
                 } else if (intent?.action == BluetoothAdapter.ACTION_STATE_CHANGED) {
                     val state = intent.getIntExtra(BluetoothAdapter.ACTION_STATE_CHANGED, 0)
                     channel.invokeMethod("bluetoothStatus", state)
-//                    if (state != 0) {
-//                        changeMode(PlayMode.Headset)
-//                    } else {
-//                        changeMode(latestPlayMode)
-//                    }
                 }
             }
         }, intentFilter)
     }
 
     private fun changeToHeadset() {
-//        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
         audioManager.isSpeakerphoneOn = false
-        audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL), AudioManager.STREAM_VOICE_CALL)
+        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
     }
 
     private fun changeToSpeaker() {
-//        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-//            audioManager.mode = AudioManager.MODE_NORMAL
         audioManager.isSpeakerphoneOn = true
-        audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL), AudioManager.STREAM_VOICE_CALL)
     }
 
     private fun changeToReceiver() {
         audioManager.isSpeakerphoneOn = false
-//        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
     }
 
     private fun changeMode(pm: PlayMode) {
         latestPlayMode = playMode
         playMode = pm
+        Log.e("===mode==", pm.toString())
         when (playMode) {
             PlayMode.Receiver -> changeToReceiver()
             PlayMode.Speaker -> changeToSpeaker()
             PlayMode.Headset -> changeToHeadset()
         }
-
-//        resetRongcloud()
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-
         if (call.method == "setSpeakerPhoneOn") {
-            if (call.hasArgument("isOn") && playMode != PlayMode.Headset) {
+            if (call.hasArgument("isOn")) {
                 var isOn: Boolean? = call.argument("isOn")
                 if (isOn != null && isOn) changeMode(PlayMode.Speaker) else changeMode(PlayMode.Headset)
             }

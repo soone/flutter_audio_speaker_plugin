@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   void setSpeakerOn() async {
-    await FlutterAudioSpeakerPlugin.setSpeakerOn(!speaker);
+    FlutterAudioSpeakerPlugin.setSpeakerOn(!speaker);
     speaker = !speaker;
     setState(() {});
   }
@@ -54,11 +54,11 @@ class _MyAppState extends State<MyApp> {
     print("===mode===" + mode);
     if (mode == "3") {
       await FlutterAudioSpeakerPlugin.setMode("normal");
-      await FlutterAudioSpeakerPlugin.rongcloudReset();
     } else {
       await FlutterAudioSpeakerPlugin.setMode("communication");
-      await FlutterAudioSpeakerPlugin.rongcloudReset();
     }
+    String aftermode = await FlutterAudioSpeakerPlugin.getMode();
+    print("===mode===" + aftermode);
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -68,12 +68,10 @@ class _MyAppState extends State<MyApp> {
     FlutterSoundPlayer soundPlayer = FlutterSoundPlayer();
     await soundPlayer.openAudioSession(
       focus: AudioFocus.requestFocusTransient,
-      category: SessionCategory.playAndRecord,
+      category: SessionCategory.playback,
       mode: SessionMode.modeDefault,
-      device: AudioDevice.speaker,
     );
 
-    await FlutterAudioSpeakerPlugin.setSpeakerOn(speaker);
     await soundPlayer.setSubscriptionDuration(const Duration(milliseconds: 30));
     Uint8List? dataBuffer;
     ByteData data = await rootBundle.load("assets/audio/calling.mp3");
@@ -84,12 +82,6 @@ class _MyAppState extends State<MyApp> {
       sampleRate: 16000,
       whenFinished: () {
         print("===finished===");
-        soundPlayer.seekToPlayer(Duration.zero);
-        soundPlayer.startPlayer(
-          fromDataBuffer: dataBuffer,
-          codec: Codec.aacADTS,
-          sampleRate: 16000,
-        );
       },
     );
 
@@ -130,6 +122,10 @@ class _MyAppState extends State<MyApp> {
               GestureDetector(
                 onTap: changeMode,
                 child: const SizedBox(height: 120, child: Text("changeMode")),
+              ),
+              GestureDetector(
+                onTap: initPlatformState,
+                child: const SizedBox(height: 120, child: Text("play again")),
               )
             ],
           ),
