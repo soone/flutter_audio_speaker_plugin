@@ -49,6 +49,18 @@ class _MyAppState extends State<MyApp> {
     print("===isHeadSetOn===" + isInCall);
   }
 
+  void changeMode() async {
+    String mode = await FlutterAudioSpeakerPlugin.getMode();
+    print("===mode===" + mode);
+    if (mode == "3") {
+      await FlutterAudioSpeakerPlugin.setMode("normal");
+      await FlutterAudioSpeakerPlugin.rongcloudReset();
+    } else {
+      await FlutterAudioSpeakerPlugin.setMode("communication");
+      await FlutterAudioSpeakerPlugin.rongcloudReset();
+    }
+  }
+
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     // Platform messages may fail, so we use a try/catch PlatformException.
@@ -114,6 +126,10 @@ class _MyAppState extends State<MyApp> {
               GestureDetector(
                 onTap: isInCall,
                 child: const SizedBox(height: 120, child: Text("isINCall")),
+              ),
+              GestureDetector(
+                onTap: changeMode,
+                child: const SizedBox(height: 120, child: Text("changeMode")),
               )
             ],
           ),

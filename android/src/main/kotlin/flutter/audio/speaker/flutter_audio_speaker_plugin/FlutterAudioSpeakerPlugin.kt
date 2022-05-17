@@ -147,14 +147,18 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
         } else if (call.method == "setMode") {
             if (call.hasArgument("mode")) {
                if (call.argument<String>("mode") == "normal") {
+                   Log.e("setMode==1", call.argument<String>("mode").toString())
                    audioManager.mode = AudioManager.MODE_NORMAL
                } else if (call.argument<String>("mode") == "communication") {
+                   Log.e("setMode==2", call.argument<String>("mode").toString())
                    audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
                }
             }
 
             rongcloudAudioManager?.resetAudioRouteState()
             result.success("ok")
+        } else if (call.method == "getMode") {
+            result.success(audioManager.mode.toString())
         }
         else {
             result.notImplemented()
@@ -196,9 +200,7 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
             rongcloudAudioManager!!.unInit()
         } else {
             RCRTCAudioRouteManager.getInstance().init(context)
-            Log.e("audio=====", "init")
             if (RCRTCAudioRouteManager.getInstance().hasInit()) {
-                Log.e("audio=====", "init nononono")
                 RCRTCAudioRouteManager.getInstance().resetAudioRouteState()
                 RCRTCAudioRouteManager.getInstance().unInit()
             }

@@ -42,4 +42,9 @@ class FlutterAudioSpeakerPlugin {
     if (Platform.isIOS) return Future.value('ok');
     return await platform.invokeMethod("setMode", {"mode": mode});
   }
+
+  static Future<String> getMode() async {
+    if (Platform.isIOS) return Future.value('ok');
+    return await platform.invokeMethod("getMode");
+  }
 }
