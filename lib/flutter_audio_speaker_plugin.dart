@@ -24,7 +24,6 @@ class FlutterAudioSpeakerPlugin {
   }
 
   static Future<int> isHeadSetOn() async {
-    if (Platform.isIOS) return Future.value(-1);
     return await platform.invokeMethod("isHeadSetOn");
   }
 
