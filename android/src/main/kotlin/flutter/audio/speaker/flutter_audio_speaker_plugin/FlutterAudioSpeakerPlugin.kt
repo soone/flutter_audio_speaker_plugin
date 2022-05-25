@@ -1,14 +1,17 @@
 package flutter.audio.speaker.flutter_audio_speaker_plugin
 
-import android.bluetooth.BluetoothAdapter
+import android.bluetooth.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.hardware.usb.UsbAccessory
+import android.hardware.usb.UsbConstants
+import android.hardware.usb.UsbDevice
+import android.hardware.usb.UsbManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
-import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.NonNull
 
@@ -18,6 +21,8 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import cn.rongcloud.rtc.api.*
+import cn.rongcloud.rtc.api.callback.IRCRTCAudioRouteListener
+import cn.rongcloud.rtc.audioroute.RCAudioRouteType
 
 /** FlutterAudioSpeakerPlugin */
 class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
@@ -28,6 +33,7 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var channel: MethodChannel
     private lateinit var context: Context
     private lateinit var audioManager: AudioManager
+//    private lateinit var usbManager: UsbManager
     private var rongcloudAudioManager : RCRTCAudioRouteManager? = null
 
     enum class PlayMode {
@@ -43,7 +49,23 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_audio_speaker_plugin")
         channel.setMethodCallHandler(this)
         context = flutterPluginBinding.getApplicationContext()
+
+        RCRTCAudioRouteManager.getInstance().init(context)
+        RCRTCAudioRouteManager.getInstance().setOnAudioRouteChangedListener(object :
+            IRCRTCAudioRouteListener {
+            override fun onRouteChanged(type : RCAudioRouteType) {
+                Log.e("====type", type.toString())
+                channel.invokeMethod("onRouteChanged", type.toString())
+            }
+
+            override fun onRouteSwitchFailed(fromType: RCAudioRouteType, toType: RCAudioRouteType) {
+                Log.e("=====typeFailed", "$fromType-$toType")
+                channel.invokeMethod("onRouteSwitchFailed", toType.toString())
+            }
+        })
+
         audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+//        usbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
 
         val intentFilter = IntentFilter()
         intentFilter.addAction(Intent.ACTION_HEADSET_PLUG)
@@ -51,8 +73,11 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
         intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         context.registerReceiver(object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
+                // Log.e("usbDevice", "typecStatus:14")
+                // Log.e("usbDevice", intent?.action.toString())
                 if (intent?.action == Intent.ACTION_HEADSET_PLUG) {
                     val state = intent.getIntExtra("state", 0)
+                    // Log.e("usbDevice", state.toString())
                     channel.invokeMethod("headSetStatus", state)
                 } else if (intent?.action == BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED) {
                     val state = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, 0)
@@ -60,9 +85,37 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
                 } else if (intent?.action == BluetoothAdapter.ACTION_STATE_CHANGED) {
                     val state = intent.getIntExtra(BluetoothAdapter.ACTION_STATE_CHANGED, 0)
                     channel.invokeMethod("bluetoothStatus", state)
+//                } else if (intent?.action == UsbManager.ACTION_USB_DEVICE_ATTACHED) {
+//                    Log.e("usbDevice", "typecStatus:13")
+//                    usbManager.deviceList.values.indexOfFirst {
+//                        it.deviceClass == UsbConstants.USB_CLASS_AUDIO
+//                    }.takeIf { it > -1 }?.run {
+//                        Log.e("usbDevice", "typecStatus:1")
+//                        channel.invokeMethod("typecStatus", 1)
+//                    }
+//                } else if (intent?.action == UsbManager.ACTION_USB_ACCESSORY_DETACHED) {
+//                    Log.e("usbDevice", "typecStatus:03")
+//                    val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
+//                    device?.apply {
+//                        if (deviceClass == UsbConstants.USB_CLASS_AUDIO) {
+//                            Log.e("usbDevice", "typecStatus:0")
+//                            channel.invokeMethod("typecStatus", 0)
+//                        }
+//                    }
+//                } else if (intent?.action == BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED) {
+//                    val adapter = BluetoothAdapter.getDefaultAdapter()
+//                    val state = adapter.getProfileConnectionState(BluetoothProfile.HEADSET)
+//                    Log.e("bluetoothStatus", state.toString())
+//                    if (state == BluetoothProfile.STATE_CONNECTED) {
+//                        channel.invokeMethod("bluetoothStatus", 1)
+//                    } else if (state == BluetoothProfile.STATE_DISCONNECTED) {
+//                        channel.invokeMethod("bluetoothStatus", 0)
+//                    }
                 }
             }
         }, intentFilter)
+
+
     }
 
     private fun changeToHeadset() {
@@ -144,11 +197,10 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
         if (rongcloudAudioManager != null) {
             return rongcloudAudioManager!!.hasHeadSet() || rongcloudAudioManager!!.hasBluetoothA2dpConnected()
         } else {
-            if (audioManager == null) return false
-
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 return audioManager.isWiredHeadsetOn || audioManager.isBluetoothScoOn || audioManager.isBluetoothA2dpOn
             } else {
+                // 判断有限连接
                 val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
 
                 for (device in devices) {
@@ -159,11 +211,34 @@ class FlutterAudioSpeakerPlugin : FlutterPlugin, MethodCallHandler {
                         return true
                     }
                 }
+
+                // 判断type-c连接
+//                usbManager.deviceList.values.indexOfFirst {
+//                    it.deviceClass == UsbConstants.USB_CLASS_AUDIO
+//                }.takeIf { it > -1 }?.run {
+//                    Log.e("usbDevice", "ok")
+//                    return true
+//                }
+
+                // 判断蓝牙连接
+//                if (isBluetoothHeadsetOn() == 1) return true
             }
         }
 
         return false
     }
+
+//    private fun isBluetoothHeadsetOn() : Int{
+//        val adapter = BluetoothAdapter.getDefaultAdapter()
+//        val state = adapter.getProfileConnectionState(BluetoothProfile.HEADSET)
+//        if (state == BluetoothProfile.STATE_CONNECTED) {
+//            return 1
+//        } else if (state == BluetoothProfile.STATE_DISCONNECTED) {
+//            return 0
+//        }
+//
+//        return -1
+//    }
 
     private fun resetRongcloud() {
         if (rongcloudAudioManager != null) {
