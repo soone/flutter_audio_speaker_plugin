@@ -1,6 +1,6 @@
 name: flutter_audio_speaker_plugin
 description: A new flutter plugin project.
-version: 0.0.2
+version: 0.0.3
 homepage:
 
 environment:
@@ -10,6 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  rtc_wrapper_plugin:
+      git:
+        url: git@github.com:soone/rtc-flutter-wrapper.git
+        ref: ym_sound_5.2.3
 
 dev_dependencies:
   flutter_test:
