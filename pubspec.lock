@@ -102,6 +102,22 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.8.0"
+  rongcloud_im_plugin:
+    dependency: transitive
+    description:
+      name: rongcloud_im_plugin
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "5.1.8+6"
+  rongcloud_rtc_wrapper_plugin:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: "ym_sound_5.2.3+105"
+      resolved-ref: "3070b02e21ad5addccf696b68836d469810d8399"
+      url: "git@github.com:soone/rtc-flutter-wrapper.git"
+    source: git
+    version: "5.1.5+7"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -165,4 +181,4 @@ packages:
     version: "2.1.1"
 sdks:
   dart: ">=2.14.0 <3.0.0"
-  flutter: ">=1.20.0"
+  flutter: ">=2.0.0"
