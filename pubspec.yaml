@@ -10,10 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  rongcloud_rtc_wrapper_plugin:
-      git:
-        url: git@github.com:soone/rtc-flutter-wrapper.git
-        ref: ym_sound_5.2.3+107
+  rongcloud_rtc_wrapper_plugin: 5.1.5+7
 
 dev_dependencies:
   flutter_test:
