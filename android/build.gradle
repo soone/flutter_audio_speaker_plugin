@@ -53,6 +53,6 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'cn.rongcloud.sdk:im_libcore:5.2.3.2'
-    implementation 'cn.rongcloud.sdk:rtc_lib:5.2.3'
+    implementation 'cn.rongcloud.sdk:im_libcore:5.2.1.1'
+    implementation 'cn.rongcloud.sdk:rtc_lib:5.2.1.1'
 }
