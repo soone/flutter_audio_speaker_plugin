@@ -16,10 +16,12 @@ class FlutterAudioSpeakerPlugin {
   }
 
   static Future<void> setSpeakerOn(bool isOn) async {
+    if (Platform.isIOS) return Future.value('ok');
     await platform.invokeMethod("setSpeakerPhoneOn", {"isOn": isOn});
   }
 
   static Future<void> resetSpeaker() async {
+    if (Platform.isIOS) return Future.value('ok');
     await platform.invokeMethod("resetSpeakerPhone");
   }
 
