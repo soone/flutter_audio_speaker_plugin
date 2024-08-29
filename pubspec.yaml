@@ -12,7 +12,8 @@ dependencies:
     sdk: flutter
   rongcloud_rtc_wrapper_plugin:
       git:
-        url: git@github.com:soone/rtc-flutter-wrapper.git
+        #url: git@github.com:soone/rtc-flutter-wrapper.git
+        url: https://github.com/soone/rtc-flutter-wrapper.git
         ref: ym_sound_5.2.3+109
 
 dev_dependencies:
